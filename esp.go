@@ -6,6 +6,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/jedipunkz/esp/cloudwatch"
 	"github.com/jedipunkz/esp/ecs"
 )
 
@@ -40,9 +41,12 @@ func main() {
 					continue
 				}
 
-				log.Printf("Container Name: %s, CPU Usage: %f", container.Name, (float64(s.CPUStats.CPUUsage.TotalUsage)-float64(s.PreCPUStats.CPUUsage.TotalUsage))/
-					(float64(s.CPUStats.SystemCPUUsage)-float64(s.PreCPUStats.SystemCPUUsage))*
-					float64(s.CPUStats.OnlineCPUs)*100)
+				cpuUsage := (float64(s.CPUStats.CPUUsage.TotalUsage) - float64(s.PreCPUStats.CPUUsage.TotalUsage)) /
+					(float64(s.CPUStats.SystemCPUUsage) - float64(s.PreCPUStats.SystemCPUUsage)) *
+					float64(s.CPUStats.OnlineCPUs) * 100
+
+				cloudwatch.PutMetricData(cpuUsage)
+				log.Printf("Container Name: %s, CPU Usage: %f", container.Name, cpuUsage)
 			}
 		}
 		time.Sleep(time.Second * 1)
