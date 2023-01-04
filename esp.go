@@ -3,6 +3,8 @@ package main
 import (
 	"context"
 	"log"
+	"os"
+	"time"
 
 	"github.com/jedipunkz/esp/ecs"
 )
@@ -24,16 +26,25 @@ func main() {
 		log.Printf("error retrieving task stats metadata: %s", err)
 	}
 
-	for _, container := range taskMetadata.Containers {
-		s := statsMetadata[container.DockerID]
-		if &s == nil {
-			log.Printf("Could not find stats for container %s", container.DockerID)
-			continue
-		}
+	containerName := os.Getenv("CONTAINER_NAME")
+	if containerName == "" {
+		log.Printf("error retrieving container name from environment variable")
+	}
 
-		log.Printf("Total CPU Usage: %d", s.CPUStats.CPUUsage.TotalUsage)
-		log.Printf("CPU Usage: %f", (float64(s.CPUStats.CPUUsage.TotalUsage)-float64(s.PreCPUStats.CPUUsage.TotalUsage))/
-			(float64(s.CPUStats.SystemCPUUsage)-float64(s.PreCPUStats.SystemCPUUsage))*
-			float64(s.CPUStats.OnlineCPUs)*100)
+	for {
+		for _, container := range taskMetadata.Containers {
+			if container.Name == containerName {
+				s := statsMetadata[container.DockerID]
+				if &s == nil {
+					log.Printf("Could not find stats for container %s", container.DockerID)
+					continue
+				}
+
+				log.Printf("Container Name: %s, CPU Usage: %f", container.Name, (float64(s.CPUStats.CPUUsage.TotalUsage)-float64(s.PreCPUStats.CPUUsage.TotalUsage))/
+					(float64(s.CPUStats.SystemCPUUsage)-float64(s.PreCPUStats.SystemCPUUsage))*
+					float64(s.CPUStats.OnlineCPUs)*100)
+			}
+		}
+		time.Sleep(time.Second * 1)
 	}
 }
