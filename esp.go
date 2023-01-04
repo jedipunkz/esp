@@ -88,7 +88,7 @@ func NewClient(endpoint string) *Client {
 func NewClientToMetadataEndpoint() (*Client, error) {
 	endpoint := os.Getenv(ecsMetadataUriEnvV4)
 	if endpoint == "" {
-		return nil, fmt.Errorf("environment variable %s not set", endpointURI)
+		return nil, fmt.Errorf("environment variable %s not set", ecsMetadataUriEnvV4)
 	}
 
 	_, err := url.Parse(endpoint)
