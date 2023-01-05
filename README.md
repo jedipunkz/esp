@@ -1,4 +1,4 @@
-# esp - ECS Stats Plotter
+# ESP - ECS Stats Plotter
 
 ## Description
 
