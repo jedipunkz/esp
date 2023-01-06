@@ -2,7 +2,7 @@
 
 ## Description
 
-esp Retrives ECS Container Stats from Metadata Endpoint and Plots Stats to Cloudwatch.
+ESP Retrives ECS Container Stats from Metadata Endpoint and Plots Stats to Cloudwatch Detailed Metrics.
 
 ## Author
 
