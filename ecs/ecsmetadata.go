@@ -42,7 +42,7 @@ type TaskMetadata struct {
 	} `json:"Containers"`
 }
 
-type StatsMetadata struct {
+type ContainerMetadata struct {
 	CPUStats struct {
 		CPUUsage struct {
 			TotalUsage        int   `json:"total_usage"`
@@ -123,8 +123,8 @@ func (c *Client) RetriveTaskMetadata(ctx context.Context) (TaskMetadata, error) 
 	return output, err
 }
 
-func (c *Client) RetriveStatsMetadata(ctx context.Context) (map[string]StatsMetadata, error) {
-	output := make(map[string]StatsMetadata)
+func (c *Client) RetriveContainersMetadata(ctx context.Context) (map[string]ContainerMetadata, error) {
+	output := make(map[string]ContainerMetadata)
 	err := c.request(ctx, c.endpoint+"/task/stats", &output)
 	return output, err
 }

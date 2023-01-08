@@ -33,7 +33,7 @@ func NewCloudwatch(params *cloudwatch.PutMetricDataInput) *Cloudwatch {
 	return &Cloudwatch{sess, svc, params}
 }
 
-func PutMetricData(value float64) error {
+func PutMetricData(value float64) (resp string, err error) {
 	namespace := os.Getenv("NAMESPACE")
 	if namespace == "" {
 		log.Printf("error retriving namespace from environment variable")
@@ -53,12 +53,12 @@ func PutMetricData(value float64) error {
 
 	client := NewCloudwatch(params)
 
-	_, err := client.svc.PutMetricData(params)
+	_, err = client.svc.PutMetricData(params)
 	if err != nil {
 		log.Println(err.Error())
-		return err
+		return "", err
 	}
 	// log.Println(resp)
 
-	return nil
+	return resp, nil
 }
