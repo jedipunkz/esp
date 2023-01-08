@@ -22,20 +22,20 @@ func main() {
 		log.Printf("error retrieving task metadata: %s", err)
 	}
 
-	statsMetadata, err := client.RetriveStatsMetadata(ctx)
+	containersMetadata, err := client.RetriveContainersMetadata(ctx)
 	if err != nil {
 		log.Printf("error retrieving task stats metadata: %s", err)
 	}
 
 	containerName := os.Getenv("CONTAINER_NAME")
 	if containerName == "" {
-		log.Printf("error retrieving container name from environment variable")
+		log.Fatal("error retrieving container name from environment variable")
 	}
 
 	for {
 		for _, container := range taskMetadata.Containers {
 			if container.Name == containerName {
-				s := statsMetadata[container.DockerID]
+				s := containersMetadata[container.DockerID]
 				if &s == nil {
 					log.Printf("Could not find stats for container %s", container.DockerID)
 					continue
@@ -45,7 +45,11 @@ func main() {
 					(float64(s.CPUStats.SystemCPUUsage) - float64(s.PreCPUStats.SystemCPUUsage)) *
 					float64(s.CPUStats.OnlineCPUs) * 100
 
-				cloudwatch.PutMetricData(cpuUsage)
+				_, err = cloudwatch.PutMetricData(cpuUsage)
+				if err != nil {
+					log.Printf("Error putting metric data: %s", err)
+				}
+
 				log.Printf("Container Name: %s, CPU Usage: %f", container.Name, cpuUsage)
 			}
 		}
