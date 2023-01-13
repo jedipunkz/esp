@@ -2,8 +2,8 @@
 
 ## Description
 
-ESP Retrives AWS ECS Container Stats from Metadata Endpoint and Plots Stats to Cloudwatch Detailed Metrics.
-ESP enables faster autoscaling of AWS ECS Tasks by indexing AWS Cloudwatch high-resolution Custom Metrics.
+ESP Retrives AWS ECS Container Stats from Metadata Endpoint and Plots Stats to Cloudwatch high-resolution Custom Metrics.
+ESP enables faster autoscaling of AWS ECS Tasks by refering to AWS Cloudwatch.
 
 ## Requirement
 
@@ -28,8 +28,9 @@ add `cloudwatch:PutMetricData` to task role.
 Build docker image and push to ECR repository.
 
 ```shell
-docker build --platform linux/amd64 -t esp .
-docker push *******.dkr.ecr.us-east-1.amazonaws.com/esp:latest
+docker build --platform linux/amd64 -t esp:latest .
+docker tag esp:latest *******.dkr.ecr.<REGION_NAME>.amazonaws.com/esp:latest
+docker push *******.dkr.ecr.<REGION_NAME>.amazonaws.com/esp:latest
 ```
 
 ### Add ESP as a sidecar container
@@ -39,29 +40,30 @@ Add ESP as a ECS sidecar container in the container definition below.
 ```json
 [
   {
-    "name": "web",
+    "name": "<CONTAINER_TO_MONITOR>",
     ...<snip>...
+  },
   {
     "name": "esp",
-    "image": "********.dkr.ecr.us-east-1.amazonaws.com/esp:latest",
+    "image": "********.dkr.ecr.<REGION_NAME>.amazonaws.com/esp:latest",
     "essential": true,
     "environment": [
       {
         "name": "CONTAINER_NAME",
-        "value": "web"
+        "value": "<CONTAINER_TO_MONITOR>"
       },
       {
         "name": "REGION",
-        "value": "us-east-1"
+        "value": "<REGION_NAME>"
       },
       {
         "name": "NAMESPACE",
-        "value": "FOO"
+        "value": "<CLOUDWATCH_METRICS_NAMESPACE_NAME>"
       }
     ], 
     "dependsOn": [
       {
-        "containerName": "web",
+        "containerName": "<CONTAINER_TO_MONITOR>",
         "condition": "START"
       }
     ]
@@ -71,9 +73,9 @@ Add ESP as a ECS sidecar container in the container definition below.
 
 | Environment Name | Description |
 |---|---|
-| CONTAINER_NAME | Container name for which you want to measure impossibility |
-| REGION | AWS Region Name |
-| NAMESPACE | Namespace name for Cloudwatch high resolution custom metrics |
+| CONTAINER_NAME | Container name for which you want to monitor |
+| REGION | AWS region name |
+| NAMESPACE | Cloudwatch metrics namespace name |
 
 ### Set Autoscalling
 
@@ -81,35 +83,17 @@ Configure Cloudwatch Metric Alarm for Autoscalling. Below is an example of Terra
 
 ```hcl
 resource "aws_cloudwatch_metric_alarm" "foo" {
-  alarm_name          = "foo-CPU-Utilization-High-30"
-  comparison_operator = "GreaterThanOrEqualToThreshold"
-  evaluation_periods  = "1"
+  ...snip...
   metric_name         = "CPUUtilization"
-  namespace           = "FOO"
-  period              = "60"
-  statistic           = "Average"
-  threshold           = "15"
-  dimensions = {
-    ClusterName = aws_ecs_cluster.foo.name
-    ServiceName = aws_ecs_service.foo.name
-  }
-  alarm_actions = [aws_appautoscaling_policy.scale_out.arn]
+  namespace           = "<CLOUDWATCH_METRICS_NAMESPACE_NAME>"
+  ...snip...
 }
 
 resource "aws_cloudwatch_metric_alarm" "foo" {
-  alarm_name          = "foo-CPU-Utilization-Low-5"
-  comparison_operator = "LessThanThreshold"
-  evaluation_periods  = "1"
+  ...snip...
   metric_name         = "CPUUtilization"
-  namespace           = "FOO"
-  period              = "60"
-  statistic           = "Average"
-  threshold           = "5"
-  dimensions = {
-    ClusterName = aws_ecs_cluster.foo.name
-    ServiceName = aws_ecs_service.foo.name
-  }
-  alarm_actions = [aws_appautoscaling_policy.scale_in.arn]
+  namespace           = "<CLOUDWATCH_METRICS_NAMESPACE_NAME>"
+  ...snip...
 }
 ```
 
