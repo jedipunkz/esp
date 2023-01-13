@@ -6,7 +6,7 @@
 ## Description
 
 ESP Retrives AWS ECS Container Stats from Metadata Endpoint and Plots Stats to Cloudwatch high-resolution Custom Metrics.
-ESP enables faster autoscaling of AWS ECS Tasks by refering to AWS Cloudwatch.
+ESP enables faster autoscaling of AWS ECS Tasks by monitoring AWS Cloudwatch.
 
 ## Requirement
 
