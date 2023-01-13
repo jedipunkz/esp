@@ -41,8 +41,8 @@ func main() {
 					continue
 				}
 
-				cpuUsage := (float64(s.CPUStats.CPUUsage.TotalUsage) - float64(s.PreCPUStats.CPUUsage.TotalUsage)) /
-					(float64(s.CPUStats.SystemCPUUsage) - float64(s.PreCPUStats.SystemCPUUsage)) *
+				cpuUsage := ((float64(s.CPUStats.CPUUsage.TotalUsage) - float64(s.PreCPUStats.CPUUsage.TotalUsage)) /
+					(float64(s.CPUStats.SystemCPUUsage) - float64(s.PreCPUStats.SystemCPUUsage))) *
 					float64(s.CPUStats.OnlineCPUs) * 100
 
 				_, err = cloudwatch.PutMetricData(cpuUsage)
