@@ -5,7 +5,7 @@
 
 ## Description
 
-ESP Retrives AWS ECS Container Stats from Metadata Endpoint and Plots Stats to Cloudwatch high-resolution Custom Metrics.
+ESP Retrives AWS ECS Container Stats from Metadata Endpoint and Plots Stats to [Cloudwatch high-resolution Custom Metrics](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/publishingMetrics.html#high-resolution-metrics).
 ESP enables faster autoscaling of AWS ECS Tasks by monitoring AWS Cloudwatch.
 
 ## Requirement
@@ -41,11 +41,6 @@ docker push *******.dkr.ecr.<REGION_NAME>.amazonaws.com/esp:latest
 Add ESP as a ECS sidecar container in the container definition below.
 
 ```json
-[
-  {
-    "name": "<CONTAINER_TO_MONITOR>",
-    ...<snip>...
-  },
   {
     "name": "esp",
     "image": "********.dkr.ecr.<REGION_NAME>.amazonaws.com/esp:latest",
@@ -53,7 +48,7 @@ Add ESP as a ECS sidecar container in the container definition below.
     "environment": [
       {
         "name": "CONTAINER_NAME",
-        "value": "<CONTAINER_TO_MONITOR>"
+        "value": "<CONTAINER_NAME_TO_MONITOR>"
       },
       {
         "name": "REGION",
@@ -66,12 +61,11 @@ Add ESP as a ECS sidecar container in the container definition below.
     ], 
     "dependsOn": [
       {
-        "containerName": "<CONTAINER_TO_MONITOR>",
+        "containerName": "<CONTAINER_NAME_TO_MONITOR>",
         "condition": "START"
       }
     ]
   }
-]
 ```
 
 | Environment Name | Description |
