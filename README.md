@@ -1,5 +1,8 @@
 # ESP - ECS Stats Plotter
 
+![Go-CI](https://github.com/jedipunkz/esp/workflows/Go-CI/badge.svg)
+![CodeQL](https://github.com/jedipunkz/esp/workflows/CodeQL/badge.svg)
+
 ## Description
 
 ESP Retrives AWS ECS Container Stats from Metadata Endpoint and Plots Stats to Cloudwatch high-resolution Custom Metrics.
