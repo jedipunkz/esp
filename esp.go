@@ -36,10 +36,6 @@ func main() {
 		for _, container := range taskMetadata.Containers {
 			if container.Name == containerName {
 				s := containersMetadata[container.DockerID]
-				if &s == nil {
-					log.Printf("Could not find stats for container %s", container.DockerID)
-					continue
-				}
 
 				cpuUsage := ((float64(s.CPUStats.CPUUsage.TotalUsage) - float64(s.PreCPUStats.CPUUsage.TotalUsage)) /
 					(float64(s.CPUStats.SystemCPUUsage) - float64(s.PreCPUStats.SystemCPUUsage))) *
