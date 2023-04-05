@@ -73,7 +73,9 @@ func TestClient_RetriveTaskMetadata(t *testing.T) {
 			return
 		}
 		data, _ := json.Marshal(expected)
-		w.Write(data)
+		if _, err := w.Write(data); err != nil {
+			t.Fatalf("failed to write response: %v", err)
+		}
 	}))
 	defer server.Close()
 
@@ -139,7 +141,9 @@ func TestClient_RetriveContainersMetadata(t *testing.T) {
 			return
 		}
 		data, _ := json.Marshal(expected)
-		w.Write(data)
+		if _, err := w.Write(data); err != nil {
+			t.Fatalf("failed to write response: %v", err)
+		}
 	}))
 	defer server.Close()
 
