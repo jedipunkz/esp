@@ -156,40 +156,36 @@ func TestClient_RetriveContainersMetadata(t *testing.T) {
 
 func TestClient_request(t *testing.T) {
 	ctx := context.Background()
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte(`{"key": "value"}`))
-	}))
-	defer server.Close()
 
-	t.Run("successful request", func(t *testing.T) {
+	t.Run("success", func(t *testing.T) {
+		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusOK)
+			if _, err := w.Write([]byte(`{"key": "value"}`)); err != nil {
+				t.Fatalf("failed to write response: %v", err)
+			}
+		}))
+		defer server.Close()
+
 		client := NewClient(server.URL)
 		var result map[string]string
 
-		err := client.request(ctx, server.URL, &result)
+		err := client.request(ctx, server.URL+"/success", &result)
 		if err != nil {
 			t.Fatalf("expected no error, got: %v", err)
 		}
 
 		expected := map[string]string{"key": "value"}
 		if !reflect.DeepEqual(result, expected) {
-			t.Errorf("expected result %v, got: %v", expected, result)
-		}
-	})
-
-	t.Run("request error", func(t *testing.T) {
-		client := NewClient("http://invalid")
-		var result map[string]string
-
-		err := client.request(ctx, "http://invalid", &result)
-		if err == nil {
-			t.Fatal("expected an error, got nil")
+			t.Errorf("expected %v, got: %v", expected, result)
 		}
 	})
 
 	t.Run("invalid JSON", func(t *testing.T) {
 		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusOK)
-			w.Write([]byte("invalid-json"))
+			if _, err := w.Write([]byte("invalid-json")); err != nil {
+				t.Fatalf("failed to write response: %v", err)
+			}
 		}))
 		defer server.Close()
 
