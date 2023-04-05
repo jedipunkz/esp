@@ -75,6 +75,12 @@ type ContainerMetadata struct {
 	} `json:"precpu_stats"`
 }
 
+type ErrorNotFound struct{}
+
+func (e *ErrorNotFound) Error() string {
+	return "not found"
+}
+
 // NewClient retrurns a new ECS client and endpoint
 func NewClient(endpoint string) *Client {
 	return &Client{
@@ -109,6 +115,10 @@ func (c *Client) request(ctx context.Context, uri string, out interface{}) error
 		return err
 	}
 	defer resp.Body.Close()
+
+	if resp.StatusCode == http.StatusNotFound {
+		return &ErrorNotFound{}
+	}
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
