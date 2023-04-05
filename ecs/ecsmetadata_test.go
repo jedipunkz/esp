@@ -211,7 +211,9 @@ func TestClient_request_NotFound(t *testing.T) {
 			w.WriteHeader(http.StatusNotFound)
 			return
 		}
-		w.Write([]byte(`{"key": "value"}`))
+		if _, err := w.Write([]byte(`{"key": "value"}`)); err != nil {
+			t.Fatalf("failed to write response: %v", err)
+		}
 	}))
 	defer server.Close()
 
