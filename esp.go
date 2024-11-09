@@ -33,6 +33,9 @@ func main() {
 			log.Fatal("error retrieving container name from environment variable")
 		}
 
+		var totalCPUUsage float64
+		var containerCount int
+
 		for _, container := range taskMetadata.Containers {
 			if container.Name == containerName {
 				s := containersMetadata[container.DockerID]
@@ -41,10 +44,8 @@ func main() {
 					(float64(s.CPUStats.SystemCPUUsage) - float64(s.PreCPUStats.SystemCPUUsage))) *
 					float64(s.CPUStats.OnlineCPUs) * 100
 
-				_, err = cloudwatch.PutMetricData(cpuUsage)
-				if err != nil {
-					log.Printf("Error putting metric data: %s", err)
-				}
+				totalCPUUsage += cpuUsage
+				containerCount++
 
 				log.SetFormatter(&log.JSONFormatter{})
 				log.WithFields(log.Fields{
@@ -60,6 +61,16 @@ func main() {
 				}).Info("ESP Stats")
 			}
 		}
+
+		if containerCount > 0 {
+			averageCPUUsage := totalCPUUsage / float64(containerCount)
+
+			_, err = cloudwatch.PutMetricData(averageCPUUsage)
+			if err != nil {
+				log.Printf("Error putting metric data: %s", err)
+			}
+		}
+
 		time.Sleep(time.Second * 1)
 	}
 }
