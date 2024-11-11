@@ -3,7 +3,7 @@ module github.com/jedipunkz/esp
 go 1.19
 
 require (
-	github.com/aws/aws-sdk-go v1.45.6
+	github.com/aws/aws-sdk-go v1.55.5
 	github.com/sirupsen/logrus v1.9.3
 )
 
